@@ -1,0 +1,53 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+data=pd.read_csv('/content/sales_data_50_rows_extended.csv')
+data.head(5)
+
+#1.Total quantity sold per product
+Total_quantity=data.groupby('Product')['Quantity'].sum()
+total_quantity
+#2.Average sale amount per region
+data.groupby('Region')['Total'].mean()
+
+#3.Top 3 customers by total spend
+data.groupby('Customer')['Total'].sum().sort_values(ascending=False).head(3)
+
+#4.Monthly sales trend
+date=pd.to_datetime(data['Date'])
+data.groupby(date.dt.month)['Total'].sum()
+
+data['Date'].unique()
+
+#5.Pivot table: Revenue by Product and Region
+pd.pivot_table(data, values='Total', index='Product', columns='Region', aggfunc='sum')
+
+#6.Which sales rep generated the highest revenue?
+data.groupby('SalesRep')['Total'].sum().sort_values(ascending=False)
+
+import seaborn as sns
+sns.boxplot(x=data['Total'])
+
+
+merged=pd.merge(data,data2,on='Customer', how='left')
+merged.head(5)
+
+#7.How many units of each product has each customer bought in total?
+merged.groupby(['Customer','Product'])['Quantity'].sum().sort_values(ascending=False).head(1)
+
+#8.Visualize the total quantity of each product sold using a bar chart
+product_sales = data.groupby("Product")["Quantity"].sum()
+
+product_sales = data.groupby("Product")["Quantity"].sum()
+
+# Bar chart ilə vizuallaşdır
+product_sales.plot(kind="bar", color="skyblue")
+plt.title("Total Quantity Sold by Product")
+plt.xlabel("Product")
+plt.ylabel("Quantity")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
