@@ -1,0 +1,109 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as s
+
+data=pd.read_csv("/content/personal_data.csv")
+
+#1.Training Completion Rate by Country
+complation=data.groupby("Country")["Training_Completed"].count()
+complation
+compltion_yes=data[data["Training_Completed"]=="Yes"].groupby("Country")["Training_Completed"].count()
+compltion_yes
+(compltion_yes/complation)*100
+
+#2.Average Purchase Amount by Gender
+by_gender=data.groupby("Gender")['Purchase_Amount'].mean().round(2)
+by_gender
+
+#3.Top 3 Countries by Average Instagram Use
+top_3=data.groupby("Country")["Instagram_Use_Hours"].mean().round(2).nlargest(3)
+top_3
+
+#4.Most Common Preferred Language
+data['Preferred_Language'].value_counts().head(1)
+
+
+#5.Filter Users with More Than 3 Hours of Instagram Use
+filtered_users = data[data["Instagram_Use_Hours"] > 3]
+filtered_users
+
+#6
+def label_purchase(amount):
+    if amount < 100:
+        return 'Low'
+    elif amount <= 200:
+        return 'Medium'
+    else:
+        return 'High'
+
+data['Purchase_Level'] = data['Purchase_Amount'].apply(label_purchase)
+dt = data[data['Purchase_Level'] == 'High']
+
+
+#8. Monthly Purchase Trend
+Extract month and year from Purchase_Date, then group by month to calculate:
+
+Total number of purchases
+
+Total purchase amount
+
+Average purchase amount
+dt
+
+data['Purchase_Date'] = pd.to_datetime(data['Purchase_Date'])
+data['Month'] = data['Purchase_Date'].dt.month
+data['Year'] = data['Purchase_Date'].dt.year
+data.groupby('Month')['Purchase_Amount'].sum()
+data.groupby('Month')['Purchase_Amount'].count()
+data.groupby('Month')['Purchase_Amount'].mean()
+
+#8. Age Grouping
+Create custom age groups:
+
+18–25 → "Young"
+
+26–35 → "Adult"
+
+36+ → "Senior"
+
+Analyze Purchase_Amount and Instagram_Use_Hours per group.
+
+data.groupby('Age')['Purchase_Amount'].mean()
+data.groupby('Age')['Instagram_Use_Hours'].mean()
+
+
+#8. Visualizations
+Seaborn/Matplotlib:
+
+Bar chart: Average purchase by Country
+
+Countplot: Training Completed by Preferred_Language
+
+Boxplot: Purchase_Amount by Purchase_Level
+
+Heatmap: Correlation between numerical features
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Country', y='Purchase_Amount', data=data)
+plt.title('Average Purchase by Country')
+plt.xlabel('Country')
+plt.ylabel('Average Purchase Amount')
+
+sns.countplot(x='Training_Completed', hue='Preferred_Language', data=data)
+plt.title('Training Completed by Preferred Language')
+plt.xlabel('Training Completed')
+plt.ylabel('Count')
+plt.legend(title='Preferred Language')
+
+sns.boxplot(x='Purchase_Date', y='Purchase_Amount', data=data)
+plt.title('Purchase Amount by Purchase Level')
+plt.xlabel('Purchase Level')
+plt.ylabel('Purchase Amount')
+
+corr = data.select_dtypes(include='number').corr()
+
+plt.figure(figsize=(10, 6))
+sns.heatmap(corr, annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.show()
